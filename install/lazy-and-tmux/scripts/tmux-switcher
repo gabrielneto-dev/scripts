@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+command -v fzf >/dev/null 2>&1 || {
+  printf 'fzf não encontrado.\n' >&2
+  exit 1
+}
+
+selection="$({
+  tmux list-windows -a -F '#{session_name}:#{window_index}	#{window_name}	#{pane_current_path}'
+} | fzf \
+  --delimiter=$'\t' \
+  --with-nth=1,2,3 \
+  --prompt='janela > ' \
+  --height=100% \
+  --layout=reverse \
+  --border=rounded \
+  --preview='tmux capture-pane -ep -t {1} -S -80' \
+  --preview-window='right,60%,wrap')" || exit 0
+
+target="${selection%%$'\t'*}"
+[[ -n "$target" ]] && tmux switch-client -t "$target"

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+CURRENT_USER_NAME="$(id -un)"
+USER_HOME_DIR="$(getent passwd "$CURRENT_USER_NAME" | cut -d: -f6)"
+NOTES_DIR="${XDG_DATA_HOME:-$USER_HOME_DIR/.local/share}/notes"
+NOTE_FILE="$NOTES_DIR/inbox.md"
+
+mkdir -p -- "$NOTES_DIR"
+if [[ ! -f "$NOTE_FILE" ]]; then
+  printf '# Inbox\n\n' > "$NOTE_FILE"
+fi
+
+exec nvim "$NOTE_FILE"

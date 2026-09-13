@@ -1,0 +1,32 @@
+-- Opções carregadas antes da inicialização dos plugins.
+vim.g.mapleader = " "
+vim.g.maplocalleader = "\\"
+vim.g.have_nerd_font = true
+vim.g.autoformat = true
+vim.g.lazyvim_prettier_needs_config = false
+vim.g.lazyvim_eslint_auto_format = true
+vim.g.lazyvim_php_lsp = "intelephense"
+vim.g.lazyvim_python_lsp = "basedpyright"
+vim.g.lazyvim_python_ruff = "ruff"
+
+local opt = vim.opt
+opt.number = true
+opt.relativenumber = true
+opt.mouse = "a"
+opt.clipboard = "unnamedplus"
+opt.confirm = true
+opt.cursorline = true
+opt.expandtab = true
+opt.shiftwidth = 2
+opt.tabstop = 2
+opt.softtabstop = 2
+opt.smartindent = true
+opt.wrap = false
+opt.scrolloff = 8
+opt.sidescrolloff = 8
+opt.signcolumn = "yes"
+opt.splitbelow = true
+opt.splitright = true
+opt.termguicolors = true
+opt.undofile = true
+opt.updatetime = 200
