@@ -3,28 +3,27 @@
 set -Eeuo pipefail
 
 usage() {
-  cat <<'EOF'
+    cat <<'EOF'
 Uso: dev-session [diretório] [nome-da-sessão]
 
 Cria uma sessão tmux com as janelas:
   1. nvim
-  2. term
-  3. claude
-  4. codex
+  2. run
+  3. term
 
 Se a sessão já existir, apenas conecta nela.
 EOF
 }
 
 if [[ ${1:-} == '-h' || ${1:-} == '--help' ]]; then
-  usage
-  exit 0
+    usage
+    exit 0
 fi
 
 PROJECT_INPUT="${1:-.}"
 [[ -d "$PROJECT_INPUT" ]] || {
-  printf 'Diretório não encontrado: %s\n' "$PROJECT_INPUT" >&2
-  exit 1
+    printf 'Diretório não encontrado: %s\n' "$PROJECT_INPUT" >&2
+    exit 1
 }
 
 PROJECT_DIR="$(cd -- "$PROJECT_INPUT" && pwd -P)"
@@ -35,35 +34,22 @@ SESSION_NAME="${SESSION_NAME%-}"
 [[ -n "$SESSION_NAME" ]] || SESSION_NAME='dev'
 
 connect_session() {
-  if [[ -n ${TMUX:-} ]]; then
-    exec tmux switch-client -t "$SESSION_NAME"
-  else
-    exec tmux attach-session -t "$SESSION_NAME"
-  fi
+    if [[ -n ${TMUX:-} ]]; then
+        exec tmux switch-client -t "$SESSION_NAME"
+    else
+        exec tmux attach-session -t "$SESSION_NAME"
+    fi
 }
 
 if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
-  connect_session
+    connect_session
 fi
 
 tmux new-session -d -s "$SESSION_NAME" -c "$PROJECT_DIR" -n nvim
 tmux send-keys -t "$SESSION_NAME:nvim" 'nvim .' C-m
+tmux new-window -d -t "$SESSION_NAME:" -c "$PROJECT_DIR" -n run
 
 tmux new-window -d -t "$SESSION_NAME:" -c "$PROJECT_DIR" -n term
-tmux new-window -d -t "$SESSION_NAME:" -c "$PROJECT_DIR" -n claude
-tmux new-window -d -t "$SESSION_NAME:" -c "$PROJECT_DIR" -n codex
-
-if command -v claude >/dev/null 2>&1; then
-  tmux send-keys -t "$SESSION_NAME:claude" 'claude' C-m
-else
-  tmux send-keys -t "$SESSION_NAME:claude" "printf '\\nClaude CLI não encontrada; esta janela ficou pronta para uso.\\n\\n'" C-m
-fi
-
-if command -v codex >/dev/null 2>&1; then
-  tmux send-keys -t "$SESSION_NAME:codex" 'codex' C-m
-else
-  tmux send-keys -t "$SESSION_NAME:codex" "printf '\\nCodex CLI não encontrada; esta janela ficou pronta para uso.\\n\\n'" C-m
-fi
 
 tmux select-window -t "$SESSION_NAME:nvim"
 connect_session
